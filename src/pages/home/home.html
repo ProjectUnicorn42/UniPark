@@ -1,14 +1,36 @@
-<ion-header>
-  <ion-navbar>
+<ion-header >
+  <ion-navbar color=dark>
     <ion-title>
-      Ionic Blank
+      Where the fuck did I park?
+      <ion-icon name="radio-button-on" large [color]="located ? 'primary' : 'dark' " style="margin-left:5%;"></ion-icon>
     </ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+<ion-content>
+		<div #map id="map">
+<!-- 
+      <ion-fab right middle>
+        <button tappable ion-fab mini><ion-icon name="apps"></ion-icon></button>
+        <ion-fab-list side="top">
+          <button tappable ion-fab color="dark" (tap)="doConfirm();"><ion-icon name="log-in"></ion-icon></button>
+        </ion-fab-list>
+        <ion-fab-list side="bottom">
+          <button tappable ion-fab color="dark" (tap)="UnParked();"><ion-icon name="log-out"></ion-icon></button>
+        </ion-fab-list>
+        <ion-fab-list side="left">
+          <ion-fab>
+            <button ion-fab mini color="dark"><ion-icon name="search"></ion-icon></button>
+            <ion-fab-list side="left">
+              <button tappable ion-fab (tap)="search(0);" color="dark"><ion-icon name="man" ></ion-icon></button>
+              <button tappable ion-fab (tap)="search(1);" color="dark"><ion-icon name="car"></ion-icon></button>
+            </ion-fab-list>
+          </ion-fab>
+        </ion-fab-list>
+
+      </ion-fab> -->
+
+
+
+		</div>
 </ion-content>
