@@ -42,7 +42,7 @@ export class HomePage {
     this.plt.ready().then((readySource) => {
       console.log('Platform ready from', readySource);
 
-  		this.loadMap();// Platform now ready, execute any required native code
+  		this.loadMap();
     });
 		// this.geofence.initialize().then(
 		// 	// resolved promise does not return a value
@@ -108,7 +108,6 @@ export class HomePage {
 					this.myMarker = marker;
 					this.myMarker.showInfoWindow();
 				}).then(()=>{
-          console.log(this.myMarker.getId);
 					this.geObserve();
 				});
 
@@ -121,7 +120,7 @@ export class HomePage {
 					title: 'You are here!'
 					// icon:'www/assets/markers/car.png'
 				};
-        
+
 				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
 					this.myMarker = marker;
 					this.myMarker.showInfoWindow();
