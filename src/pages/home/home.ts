@@ -70,73 +70,74 @@ export class HomePage {
     console.log(this.element);
 		this.gmap = new GoogleMap(this.element);
 
-    // this.gmap.on(GoogleMapsEvent.MAP_READY).subscribe(()=>{console.log("Map is Ready!");});
+    this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
+      console.log("Map is Ready!");
 
-		this.geolocation.getCurrentPosition().then((pos) => {
-			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-      console.log("Getting Location");
-      console.log(this.gmap);
+  		this.geolocation.getCurrentPosition().then((pos) => {
+  			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
+        console.log("Getting Location");
+        console.log(this.gmap);
 
-			// move the map's camera to position
-			this.gmap.animateCamera({
-			  'target': this.myLocation,
-			  'tilt': 30,
-			  'zoom': 17,
-			  'bearing': 140
-			});
-      console.log(this.gmap);
+  			// move the map's camera to position
+  			this.gmap.animateCamera({
+  			  'target': this.myLocation,
+  			  'tilt': 30,
+  			  'zoom': 17,
+  			  'bearing': 140
+  			});
+        console.log(this.gmap);
 
-			//previous car marker
-			if(this.parkingLocation != null){
-				//Search for previously stored location
-				let myMarkerOptions1: MarkerOptions = {
-					position: this.parkingLocation,
-					title: 'You parked here!',
-					icon: 'www/assets/markers/car.png'
-				};
-				this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
-					this.carMarker = marker;
-				});
+  			//previous car marker
+  			if(this.parkingLocation != null){
+  				//Search for previously stored location
+  				let myMarkerOptions1: MarkerOptions = {
+  					position: this.parkingLocation,
+  					title: 'You parked here!',
+  					icon: 'www/assets/markers/car.png'
+  				};
+  				this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
+  					this.carMarker = marker;
+  				});
 
-				//mymarker
-				let myMarkerOptions2: MarkerOptions = {
-					position: this.myLocation,
-					title: 'You are here!',
-					icon:'www/assets/markers/male-2.png'
-				};
+  				//mymarker
+  				let myMarkerOptions2: MarkerOptions = {
+  					position: this.myLocation,
+  					title: 'You are here!',
+  					icon:'www/assets/markers/male-2.png'
+  				};
 
-				this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
-					this.myMarker = marker;
-					this.myMarker.showInfoWindow();
-				}).then(()=>{
-					this.geObserve();
-				});
-
-			}else{
-				console.log("Null Parking Location ");
-				//mymarker
-				let myMarkerOptions3: MarkerOptions = {
-					position: this.myLocation,
-					title: 'You are here!'
-					// icon:'www/assets/markers/car.png'
-				};
-        console.log("set options");
-  				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
-            console.log("Marker added!");
+  				this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
   					this.myMarker = marker;
   					this.myMarker.showInfoWindow();
   				}).then(()=>{
-            console.log("Calling geobserve");
   					this.geObserve();
   				});
 
-			}
+  			}else{
+  				console.log("Null Parking Location ");
+  				//mymarker
+  				let myMarkerOptions3: MarkerOptions = {
+  					position: this.myLocation,
+  					title: 'You are here!',
+  					icon:'www/assets/markers/car.png'
+  				};
+          console.log("set options");
+    				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
+              console.log("Marker added!");
+    					this.myMarker = marker;
+    					this.myMarker.showInfoWindow();
+    				}).then(()=>{
+              console.log("Should be Calling geobserve");
+    					// this.geObserve();
+    				});
 
-		}).catch((error) => {
-		  console.log('Error getting location', error);
-      this.located=false;
+  			}
+
+  		}).catch((error) => {
+  		  console.log('Error getting location', error);
+        this.located=false;
+  		});
 		});
-
 
 
 	}
