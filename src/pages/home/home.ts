@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController , LoadingController, Platform } from 'ionic-angular';
-import {GoogleMap, GoogleMapsEvent, LatLng,MarkerOptions,Marker} from '@ionic-native/google-maps';
+import {GoogleMap, GoogleMaps, GoogleMapsEvent, LatLng,MarkerOptions,Marker} from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 // import { Geofence } from '@ionic-native/geofence';
 // import { Storage } from '@ionic/storage';
@@ -11,17 +11,19 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   templateUrl: 'home.html'
 })
 export class HomePage {
+  @ViewChild('map') mapElement:ElementRef;
+  gmap:GoogleMap;
+
   //locations
   myLocation : LatLng;
   parkingLocation: LatLng;
   //geolocation
   watch : any;
-  geolocation : Geolocation;
+  // geolocation : Geolocation;
   //map
-  element:HTMLElement;
 	myMarker:Marker;
 	carMarker:Marker;
-	gmap:GoogleMap;
+  gmapready:boolean;
 
   alertPro:any;
   splash:any;
@@ -31,116 +33,146 @@ export class HomePage {
   // stora:any;
 	loading : any;
 	// geofence : Geofence;
-  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform) {
-		this.geolocation = new Geolocation;
+  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation) {
+		// this.geolocation = new Geolocation;
+    this.gmapready=false;
 		// this.geofence = new Geofence;
 		// this.stora = this.storage;
     this.alertPro=alerCtrl;
     this.splash=this.splashScreen;
     this.located=false;
 		this.presentLoadingDefault();
+
     this.plt.ready().then((readySource) => {
-      console.log('Platform ready from', readySource);
-
-  		this.loadMap();
+      //Platform Ready
+      console.log('|Platform ready from', readySource);
+  		// this.loadMap();
     });
-		// this.geofence.initialize().then(
-		// 	// resolved promise does not return a value
-		// 	() => console.log('Geofence Plugin Ready'),
-		// 	(err) => console.log(err)
-		// );
-		// this.stora.get('parkingCoords')
-		// .then((retval) => {
-		// 	this.parkingLocation = retval;
-		// 	console.log("Previous Location Found! \n"+retval);
-    //
-		// },(err) => {
-		// 	console.log("Problemz with Storagezzzzz");
-		// });
-
 	}
+
 	ngAfterViewInit() {
-    console.log("ngAfterViewInit");
+    console.log("|ngAfterViewInit");
     this.splash.hide();
+    this.initmap();
 	}
 
-	loadMap() {
-    console.log("Get element by id");
-		this.element = document.getElementById('map');
-    console.log(this.element);
-		this.gmap = new GoogleMap(this.element);
 
+  initmap() {
+    let element = this.mapElement.nativeElement;
+    this.gmap = GoogleMaps.create(element);
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
-      console.log("Map is Ready!");
+      this.getLocation().then( (res) => {
+        console.log("||Got Location!")
+  			this.myLocation = new LatLng(res.coords.latitude,res.coords.longitude);
+        //moveCamera
+        this.moveCamera(this.myLocation);
+        //create myMarker
+        this.createMarker(this.myLocation, 'You are here!', 'main/www/assets/markers/car.png');
+      }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
+    });
+  }
 
-  		this.geolocation.getCurrentPosition().then((pos) => {
-  			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-        console.log("Getting Location");
-        console.log(this.gmap);
+  getLocation(){
+    return this._geoloc.getCurrentPosition();
+  }
 
-  			// move the map's camera to position
-  			this.gmap.animateCamera({
-  			  'target': this.myLocation,
-  			  'tilt': 30,
-  			  'zoom': 17,
-  			  'bearing': 140
-  			});
-        console.log(this.gmap);
-
-  			//previous car marker
-  			if(this.parkingLocation != null){
-  				//Search for previously stored location
-  				let myMarkerOptions1: MarkerOptions = {
-  					position: this.parkingLocation,
-  					title: 'You parked here!',
-  					icon: 'www/assets/markers/car.png'
-  				};
-  				this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
-  					this.carMarker = marker;
-  				});
-
-  				//mymarker
-  				let myMarkerOptions2: MarkerOptions = {
-  					position: this.myLocation,
-  					title: 'You are here!',
-  					icon:'www/assets/markers/male-2.png'
-  				};
-
-  				this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
-  					this.myMarker = marker;
-  					this.myMarker.showInfoWindow();
-  				}).then(()=>{
-  					this.geObserve();
-  				});
-
-  			}else{
-  				console.log("Null Parking Location ");
-  				//mymarker
-  				let myMarkerOptions3: MarkerOptions = {
-  					position: this.myLocation,
-  					title: 'You are here!',
-  					icon:'www/assets/markers/car.png'
-  				};
-          console.log("set options");
-    				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
-              console.log("Marker added!");
-    					this.myMarker = marker;
-    					this.myMarker.showInfoWindow();
-    				}).then(()=>{
-              console.log("Should be Calling geobserve");
-    					// this.geObserve();
-    				});
-
-  			}
-
-  		}).catch((error) => {
-  		  console.log('Error getting location', error);
-        this.located=false;
-  		});
+  moveCamera(loc: LatLng) {
+	// move the map's camera to position
+		this.gmap.animateCamera({
+		  'target': loc,
+		  'tilt': 30,
+		  'zoom': 17,
+		  'bearing': 140
 		});
+    console.log(this.gmap);
+  }
+
+  createMarker(loc: LatLng, titlez: string, iconz: string){
+    //mymarker
+		let myMarkerOptions3: MarkerOptions = {
+			position: loc,
+			title: titlez,
+			icon:iconz
+		};
+    console.log("|||set options");
+		this.gmap.addMarker(myMarkerOptions3).then((marker: Marker)=>{
+      console.log("||||Marker added!");
+			this.myMarker = marker;
+			this.myMarker.showInfoWindow();
+		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);})
+    .then(()=>{
+      console.log("|||||Should be Calling geobserve");
+			this.geObserve();
+		});
+  }
+
+  geObserve(){
+    this.watch = this._geoloc.watchPosition();
+    this.watch.subscribe((pos) => {
+      console.log("|||||I AM WATCHING YOU");
+      // create LatLng object
+      this.located=true;
+      this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
+      this.myMarker.setPosition(this.myLocation);
+      this.moveCamera(this.myLocation);
+    });
+  }
 
 
-	}
+	// loadMap() {
+  //   console.log("Get element by id");
+	// 	this.element = document.getElementById('map');
+  //   console.log(this.element);
+	// 	this.gmap = new GoogleMap(this.element);
+  //
+  //   this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
+  //     console.log("Map is Ready!");
+  //     this.gmapready=true;
+  //
+  // 		this.geolocation.getCurrentPosition().then((pos) => {
+  // 			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
+  //       console.log("Getting Location");
+  //       console.log(this.gmap);
+  //
+
+
+  			// //previous car marker
+  			// if(this.parkingLocation != null){
+  			// 	//Search for previously stored location
+  			// 	let myMarkerOptions1: MarkerOptions = {
+  			// 		position: this.parkingLocation,
+  			// 		title: 'You parked here!',
+  			// 		icon: 'www/assets/markers/car.png'
+  			// 	};
+  			// 	this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
+  			// 		this.carMarker = marker;
+  			// 	});
+        //
+  			// 	//mymarker
+  			// 	let myMarkerOptions2: MarkerOptions = {
+  			// 		position: this.myLocation,
+  			// 		title: 'You are here!',
+  			// 		icon:'www/assets/markers/male-2.png'
+  			// 	};
+        //
+  			// 	this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
+  			// 		this.myMarker = marker;
+  			// 		this.myMarker.showInfoWindow();
+  			// 	}).then(()=>{
+  			// 		this.geObserve();
+  			// 	});
+        //
+  			// }else{
+  // 				console.log("Null Parking Location ");
+  //
+  // 			// }
+  // 		}).catch((error) => {
+  // 		  console.log('Error getting location', error);
+  //         this.located=false;
+  // 		});
+	// 	});
+	// }
+
 // 	//// just geofence things    ////////////////
 //
 // 	addGeofence() {
@@ -171,54 +203,43 @@ export class HomePage {
 //
 //
 	/////////////////////////////////////////
-  geObserve(){
 
-   	this.watch = this.geolocation.watchPosition();
-		this.watch.subscribe((pos) => {
-      console.log("I AM WATCHING YOU");
-			// create LatLng object
-      this.located=true;
-			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-			// this.myMarker.setPosition(this.myLocation);
 
-		});
-	}
-
-	iParkedHere(){
-		this.presentLoadingDefault();
-		this.loading.present().then;
-		this.geolocation.getCurrentPosition().then((pos) => {
-					this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-					// this.stora.set('parkingCoords',this.parkingLocation);
-					this.myMarker.remove();
-
-					//mymarker
-					let myMarkerOptions2: MarkerOptions = {
-						position: this.myLocation,
-						title: 'You are here!',
-						icon:'www/assets/markers/male-2.png'
-					};
-
-					this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
-						this.myMarker = marker;
-					});
-					let myMarkerOptions1: MarkerOptions = {
-						position: this.parkingLocation,
-						title: 'You parked here!',
-						icon: 'www/assets/markers/car.png'
-					};
-					this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
-						this.carMarker = marker;
-					}).then(()=>{
-						if(this.loading){this.loading.dismiss();}
-
-						});
-		}).catch((error) => {
-		  console.log('Error getting location', error);
-      if(this.loading){this.loading.dismiss();this.located=false;}
-		});
-
-	}
+	// iParkedHere(){
+	// 	this.presentLoadingDefault();
+	// 	this.loading.present().then;
+	// 	this.geolocation.getCurrentPosition().then((pos) => {
+	// 				this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
+	// 				// this.stora.set('parkingCoords',this.parkingLocation);
+	// 				this.myMarker.remove();
+  //
+	// 				//mymarker
+	// 				let myMarkerOptions2: MarkerOptions = {
+	// 					position: this.myLocation,
+	// 					title: 'You are here!',
+	// 					icon:'www/assets/markers/male-2.png'
+	// 				};
+  //
+	// 				this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
+	// 					this.myMarker = marker;
+	// 				});
+	// 				let myMarkerOptions1: MarkerOptions = {
+	// 					position: this.parkingLocation,
+	// 					title: 'You parked here!',
+	// 					icon: 'www/assets/markers/car.png'
+	// 				};
+	// 				this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
+	// 					this.carMarker = marker;
+	// 				}).then(()=>{
+	// 					if(this.loading){this.loading.dismiss();}
+  //
+	// 					});
+	// 	}).catch((error) => {
+	// 	  console.log('Error getting location', error);
+  //     if(this.loading){this.loading.dismiss();this.located=false;}
+	// 	});
+  //
+	// }
 // 	UnParked(){
 //
 //     if (this.parkingLocation!=null){
