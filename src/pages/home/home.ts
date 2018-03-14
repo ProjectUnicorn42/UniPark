@@ -70,13 +70,14 @@ export class HomePage {
     console.log(this.element);
 		this.gmap = new GoogleMap(this.element);
 
+    // this.gmap.on(GoogleMapsEvent.MAP_READY).subscribe(()=>{console.log("Map is Ready!");});
 
 		this.geolocation.getCurrentPosition().then((pos) => {
 			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
       console.log("Getting Location");
       console.log(this.gmap);
 
-					 // move the map's camera to position
+			// move the map's camera to position
 			this.gmap.animateCamera({
 			  'target': this.myLocation,
 			  'tilt': 30,
@@ -111,7 +112,6 @@ export class HomePage {
 					this.geObserve();
 				});
 
-
 			}else{
 				console.log("Null Parking Location ");
 				//mymarker
@@ -120,16 +120,15 @@ export class HomePage {
 					title: 'You are here!'
 					// icon:'www/assets/markers/car.png'
 				};
-
-				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
-					this.myMarker = marker;
-					this.myMarker.showInfoWindow();
-				}).then(()=>{
-          console.log("Calling geobserve");
-					this.geObserve();
-				});
-
-
+        console.log("set options");
+  				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
+            console.log("Marker added!");
+  					this.myMarker = marker;
+  					this.myMarker.showInfoWindow();
+  				}).then(()=>{
+            console.log("Calling geobserve");
+  					this.geObserve();
+  				});
 
 			}
 
