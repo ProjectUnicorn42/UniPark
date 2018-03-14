@@ -128,11 +128,9 @@ export class HomePage {
     					this.myMarker.showInfoWindow();
     				}).then(()=>{
               console.log("Should be Calling geobserve");
-    					// this.geObserve();
+    					this.geObserve();
     				});
-
   			}
-
   		}).catch((error) => {
   		  console.log('Error getting location', error);
         this.located=false;
