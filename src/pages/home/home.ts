@@ -11,19 +11,18 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   templateUrl: 'home.html'
 })
 export class HomePage {
+  //map
   @ViewChild('map') mapElement:ElementRef;
   gmap:GoogleMap;
 
-  //locations
-  myLocation : LatLng;
-  parkingLocation: LatLng;
-  //geolocation
-  watch : any;
-  // geolocation : Geolocation;
-  //map
 	myMarker:Marker;
 	carMarker:Marker;
   gmapready:boolean;
+
+  //locations
+  watch : any;
+  myLocation : LatLng;
+  parkingLocation: LatLng;
 
   alertPro:any;
   splash:any;
@@ -42,41 +41,16 @@ export class HomePage {
     this.splash=this.splashScreen;
     this.located=false;
 		this.presentLoadingDefault();
-
 	}
 
 	ionViewDidLoad() {
     console.log("|ngAfterViewInit");
-    this.splash.hide();
-    this.initmap();
-	}
-
-
-  initmap() {
-    let element = this.mapElement.nativeElement;
-    this.gmap = GoogleMaps.create(element);
-    this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
-      this.plt.ready().then(()=>{
-        console.log("|PLATFORM READY!");
-        let mocloc = new LatLng(35.098765, 24.123456);
-        let myMarkerOptions3: MarkerOptions = {
-          position: mocloc,
-          title: 'You are here!',
-          // icon: 'http://www.bedroomjoys.com/uploaded/thumbnails/rocks-off-little-cocky-passionate-dildo-pink_24535_700x700.jpg'
-          icon : 'assets/markers/car.png'
-        };
-        this.createMarker(myMarkerOptions3);
-        // }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
-      });
+    this.plt.ready().then(()=>{
+      console.log("|DEVICE READY");
+      this.splash.hide();
+      this.initmap();
     });
-  }
-
-  getLocation(){
-    // this.plt.ready().then(()=>{
-    //   console.log("READY!");
-      return this._geoloc.getCurrentPosition();
-    // });
-  }
+	}
 
   moveCamera(loc: LatLng) {
 	// move the map's camera to position
@@ -86,12 +60,27 @@ export class HomePage {
 		  'zoom': 17,
 		  'bearing': 140
 		});
-    console.log(this.gmap);
+  }
+  
+  initmap() {
+    let element = this.mapElement.nativeElement;
+    this.gmap = GoogleMaps.create(element);
+    this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
+      console.log("|Map  READY!");
+      let mocloc = new LatLng(35.098765, 24.123456);
+      let myMarkerOptions3: MarkerOptions = {
+        position: mocloc,
+        title: 'You are here!',
+        icon : 'assets/markers/car.png'
+      };
+      this.createMarker(myMarkerOptions3);
+    });
   }
 
   createMarker(opt: MarkerOptions){
     console.log("|||set Marker options");
-		this.gmap.addMarker(opt).then((marker: Marker)=>{
+		this.gmap.addMarker(opt)
+    .then((marker: Marker)=>{
       console.log("||||Marker added!");
 			this.myMarker = marker;
       this.myMarker.setVisible(false);
@@ -113,10 +102,11 @@ export class HomePage {
         this.myMarker.setVisible(true);
   			this.myMarker.showInfoWindow();
         this.moveCamera(this.myLocation);
-        // this.myMarker.setIcon({url: 'www/assets/markers/car.png'});
-      }else{console.log('Marker was already visible');}
+      }
     });
   }
+
+
 
 
 	// loadMap() {
@@ -321,7 +311,7 @@ export class HomePage {
 
  ////////LOADING         ////////////////////////////////////////////
 	presentLoadingDefault() {
-	  this.loading = this.loadingCtrl.create({
+    this.loading = this.loadingCtrl.create({
 		content: 'Memorizing in your stead...'
 	  });
 	}
