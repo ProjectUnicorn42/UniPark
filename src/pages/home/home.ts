@@ -124,6 +124,7 @@ export class HomePage {
     });
   }
 
+<<<<<<< HEAD
 
 	// loadMap() {
   //   console.log("Get element by id");
@@ -141,6 +142,31 @@ export class HomePage {
   //       console.log(this.gmap);
   //
 
+=======
+  			}else{
+  				console.log("Null Parking Location ");
+  				//mymarker
+  				let myMarkerOptions3: MarkerOptions = {
+  					position: this.myLocation,
+  					title: 'You are here!',
+  					icon:'www/assets/markers/car.png'
+  				};
+          console.log("set options");
+    				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
+              console.log("Marker added!");
+    					this.myMarker = marker;
+    					this.myMarker.showInfoWindow();
+    				}).then(()=>{
+              console.log("Should be Calling geobserve");
+    					this.geObserve();
+    				});
+  			}
+  		}).catch((error) => {
+  		  console.log('Error getting location', error);
+        this.located=false;
+  		});
+		});
+>>>>>>> a6ea33d33be174ac176088f1aeb331d7c86f387f
 
   			// //previous car marker
   			// if(this.parkingLocation != null){
