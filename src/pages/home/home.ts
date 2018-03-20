@@ -61,19 +61,25 @@ export class HomePage {
     let element = this.mapElement.nativeElement;
     this.gmap = GoogleMaps.create(element);
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
-      this.getLocation().then( (res) => {
-        console.log("||Got Location!")
-  			this.myLocation = new LatLng(res.coords.latitude,res.coords.longitude);
-        //moveCamera
-        this.moveCamera(this.myLocation);
-        //create myMarker
-        this.createMarker(this.myLocation, 'You are here!', 'main/www/assets/markers/car.png');
-      }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
+      this.plt.ready().then(()=>{
+        console.log("|PLATFORM READY!");
+        this.getLocation().then( (res) => {
+          console.log("||Got Location!")
+    			this.myLocation = new LatLng(res.coords.latitude,res.coords.longitude);
+          //moveCamera
+          this.moveCamera(this.myLocation);
+          //create myMarker
+          this.createMarker(this.myLocation, 'You are here!', 'main/www/assets/markers/car.png');
+        }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
+      });
     });
   }
 
   getLocation(){
-    return this._geoloc.getCurrentPosition();
+    // this.plt.ready().then(()=>{
+    //   console.log("READY!");
+      return this._geoloc.getCurrentPosition();
+    // });
   }
 
   moveCamera(loc: LatLng) {
@@ -94,7 +100,7 @@ export class HomePage {
 			title: titlez,
 			icon:iconz
 		};
-    console.log("|||set options");
+    console.log("|||set Marker options");
 		this.gmap.addMarker(myMarkerOptions3).then((marker: Marker)=>{
       console.log("||||Marker added!");
 			this.myMarker = marker;
