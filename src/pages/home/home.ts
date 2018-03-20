@@ -43,14 +43,9 @@ export class HomePage {
     this.located=false;
 		this.presentLoadingDefault();
 
-    this.plt.ready().then((readySource) => {
-      //Platform Ready
-      console.log('|Platform ready from', readySource);
-  		// this.loadMap();
-    });
 	}
 
-	ngAfterViewInit() {
+	ionViewDidLoad() {
     console.log("|ngAfterViewInit");
     this.splash.hide();
     this.initmap();
@@ -63,14 +58,15 @@ export class HomePage {
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
       this.plt.ready().then(()=>{
         console.log("|PLATFORM READY!");
-        this.getLocation().then( (res) => {
-          console.log("||Got Location!")
-    			this.myLocation = new LatLng(res.coords.latitude,res.coords.longitude);
-          //moveCamera
-          this.moveCamera(this.myLocation);
-          //create myMarker
-          this.createMarker(this.myLocation, 'You are here!', 'main/www/assets/markers/car.png');
-        }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
+        let mocloc = new LatLng(35.098765, 24.123456);
+        let myMarkerOptions3: MarkerOptions = {
+          position: mocloc,
+          title: 'You are here!',
+          // icon: 'http://www.bedroomjoys.com/uploaded/thumbnails/rocks-off-little-cocky-passionate-dildo-pink_24535_700x700.jpg'
+          icon : 'assets/markers/car.png'
+        };
+        this.createMarker(myMarkerOptions3);
+        // }).catch((err)=>{console.log("||Error Getting Location!");console.log(err);});
       });
     });
   }
@@ -93,23 +89,15 @@ export class HomePage {
     console.log(this.gmap);
   }
 
-  createMarker(loc: LatLng, titlez: string, iconz: string){
-    //mymarker
-		let myMarkerOptions3: MarkerOptions = {
-			position: loc,
-			title: titlez,
-			icon:iconz
-		};
+  createMarker(opt: MarkerOptions){
     console.log("|||set Marker options");
-		this.gmap.addMarker(myMarkerOptions3).then((marker: Marker)=>{
+		this.gmap.addMarker(opt).then((marker: Marker)=>{
       console.log("||||Marker added!");
 			this.myMarker = marker;
-			this.myMarker.showInfoWindow();
-		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);})
-    .then(()=>{
+      this.myMarker.setVisible(false);
       console.log("|||||Should be Calling geobserve");
 			this.geObserve();
-		});
+		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);});
   }
 
   geObserve(){
@@ -120,7 +108,13 @@ export class HomePage {
       this.located=true;
       this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
       this.myMarker.setPosition(this.myLocation);
-      this.moveCamera(this.myLocation);
+      if (!this.myMarker.isVisible()){
+        console.log("Marker was not Visible");
+        this.myMarker.setVisible(true);
+  			this.myMarker.showInfoWindow();
+        this.moveCamera(this.myLocation);
+        // this.myMarker.setIcon({url: 'www/assets/markers/car.png'});
+      }else{console.log('Marker was already visible');}
     });
   }
 
