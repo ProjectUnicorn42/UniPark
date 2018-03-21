@@ -3,7 +3,7 @@ import { NavController , LoadingController, Platform } from 'ionic-angular';
 import {GoogleMap, GoogleMaps, GoogleMapsEvent, LatLng,MarkerOptions,Marker} from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 // import { Geofence } from '@ionic-native/geofence';
-// import { Storage } from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 @Component({
@@ -17,6 +17,7 @@ export class HomePage {
 
 	myMarker:Marker;
 	carMarker:Marker;
+  manMarker:Marker;
   gmapready:boolean;
 
   //locations
@@ -24,7 +25,7 @@ export class HomePage {
   myLocation : LatLng;
   parkingLocation: LatLng;
 
-  // stora:any;
+
 	// geofence : Geofence;
 
   // UI stuff
@@ -36,34 +37,45 @@ export class HomePage {
   located:any;
 	loading : any;
 
-  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation) {
+  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation, private stora: Storage) {
     this.gmapready=false;
 		// this.geofence = new Geofence;
-		// this.stora = this.storage;
     this.alertPro=alerCtrl;
     this.splash=this.splashScreen;
-    this.parkFlag=false;
     this.located=false;
-		this.presentLoadingDefault();
+    this.parkingLocation=null;
+
 	}
 
 	ionViewDidLoad() {
-    console.log("|ngAfterViewInit");
+    console.log("|ViewDidLoad");
     this.plt.ready().then(()=>{
       console.log("|DEVICE READY");
       this.splash.hide();
       this.initmap();
+      //Storage Lookup
+      this.stora.ready()
+      .then(()=>{
+        console.log("|Storage Ready");
+        this.stora.get('parkingCoords')
+        .then((coords)=>{
+          console.log("|Got Coords From Storage");
+          console.log(coords);
+          this.parkingLocation=coords;
+        }).catch((err)=>{console.log("~Error getting coords");});
+      }).catch((err)=>{console.log("~Error Opening storage");});
     });
 	}
 
   moveCamera(loc: LatLng) {
-	// move the map's camera to position
-		this.gmap.animateCamera({
-		  'target': loc,
-		  'tilt': 30,
-		  'zoom': 17,
-		  'bearing': 140
-		});
+    if(this.gmap){
+  		this.gmap.animateCamera({
+  		  'target': loc,
+  		  'tilt': 30,
+  		  'zoom': 17,
+  		  'bearing': 140
+  		});
+    }
   }
 
   initmap() {
@@ -72,25 +84,49 @@ export class HomePage {
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
       console.log("|Map  READY!");
 
-      //create carMarker
-      let mocloc = new LatLng(35.098765, 24.123456);
       let carloc = new LatLng(35.098765, 24.123456);
+      let carstr = 'You are here';
+      let mocloc = new LatLng(35.098765, 24.123456); //Man Marker
 
-      this.createMarker(carloc,'You are here!','assets/markers/car.png')
+      //create Car Marker/
+      this.createMarker(carloc,carstr,'assets/markers/car.png')
       .then((marker: Marker)=>{
         console.log("Car marker Resolved!");
-        // console.log(marker);
-        if (this.parkFlag){
-          this.carMarker=marker;
+        this.carMarker=marker;
+        this.carMarker.setVisible(false);
+        if (this.parkingLocation != null){
+          //Parking location is stored. Resolve Parked position
+          this.carMarker.setPosition(this.parkingLocation);
           this.carMarker.setVisible(true);
+          console.log("Parking Location Stored");
         }else{
+          console.log("null parking location");
+          //No parking location stored. User moving on car
     			this.myMarker = marker;
           this.myMarker.setVisible(false);
           console.log("|||||Calling geobserve");
           this.geObserve();
         }
+      }).catch((err)=>{console.log(err);});
 
-      });
+      //Create Man Marker
+      this.createMarker(mocloc,'You are here!','assets/markers/male-2.png')
+      .then((marker: Marker)=>{
+        console.log("Man marker Resolved!");
+        this.manMarker= marker;
+        if (this.parkingLocation != null){
+          //Parking location stored. User is moving on foot
+    			this.myMarker = marker;
+          this.myMarker.setVisible(false);
+          console.log("|||||Calling geobserve");
+          this.geObserve();
+        }else{
+          //No parking location stored. User moving on car - Hide Man marker
+          this.manMarker.setVisible(false);
+          console.log('User is moving with car');
+        }
+      }).catch((err)=>{console.log(err);});
+
     });
   }
 
@@ -105,7 +141,6 @@ export class HomePage {
   		this.gmap.addMarker(opt)
       .then((marker: Marker)=>{
         console.log("||||Marker added!");
-        // console.log(marker);
         resolve(marker);
   		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);reject(err);});
     });
@@ -128,62 +163,76 @@ export class HomePage {
     });
   }
 
+	iParkedHere(){
+		this.presentLoadingDefault('Memorizing in your stead...');
+		this.loading.present();
+		this._geoloc.getCurrentPosition().then((pos) => {
+			this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
+			this.stora.set('parkingCoords',this.parkingLocation);
+      console.log(this.parkingLocation);
+      if(this.loading){this.loading.dismiss();}
+      this.carMarker.setPosition(this.parkingLocation);
+      this.carMarker.setTitle('You Parked here');
+      this.carMarker.setVisible(true);
+      this.manMarker.setPosition(this.parkingLocation);
+      this.myMarker=this.manMarker;
+      this.myMarker.setVisible(true);
+		}).catch((error) => {
+		  console.log('Error getting location', error);
+      if(this.loading){this.loading.dismiss();this.located=false;}
+		});
+	}
 
 
+	UnParked(){
+		this.presentLoadingDefault('Forgeting in your stead...');
+    this.loading.present();
+		this._geoloc.getCurrentPosition().then((gpos) => {
+      console.log("Got location");
+      this.manMarker.setVisible(false);
+      this.carMarker.setVisible(false);
+      let curpos = new LatLng(gpos.coords.latitude, gpos.coords.longitude);
+      this.myMarker=this.carMarker;
+      this.myMarker.setPosition(curpos);
+      this.myMarker.setTitle('You are here');
+      this.myMarker.setVisible(true);
+      if(this.loading){this.loading.dismiss();}
+    }).catch((error) => {
+	    console.log('Error getting location', error);
+      if(this.loading){this.loading.dismiss();this.located=false;}
+		});
+    //clean cache
+    this.stora.set('parkingCoords',null).then(()=>{
+      console.log("Cache Clean");
+    },(err) => {
+      console.log("Problemz with Storagezzzzz");
+    });
+    this.parkingLocation=null;
+	}
 
-	// loadMap() {
-  //   console.log("Get element by id");
-	// 	this.element = document.getElementById('map');
-  //   console.log(this.element);
-	// 	this.gmap = new GoogleMap(this.element);
-  //
-  //   this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
-  //     console.log("Map is Ready!");
-  //     this.gmapready=true;
-  //
-  // 		this.geolocation.getCurrentPosition().then((pos) => {
-  // 			this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-  //       console.log("Getting Location");
-  //       console.log(this.gmap);
-  //
 
+  search(target){
+    let searchtarget=null;
+    if(target == 0){ searchtarget = this.myLocation; console.log("locating person");}
+    else{ searchtarget = this.parkingLocation; console.log("locating car");}
+    if( this.gmap && searchtarget ){
+      console.log("target location: "+ searchtarget);
+      this.gmap.animateCamera({
+          'target': searchtarget,
+          'tilt': 30,
+          'zoom': 17,
+          'bearing': 140
+      });
+    }else{console.log("Null map or target\n" + this.gmap+"--"+searchtarget);}
+  }
 
-  			// //previous car marker
-  			// if(this.parkingLocation != null){
-  			// 	//Search for previously stored location
-  			// 	let myMarkerOptions1: MarkerOptions = {
-  			// 		position: this.parkingLocation,
-  			// 		title: 'You parked here!',
-  			// 		icon: 'www/assets/markers/car.png'
-  			// 	};
-  			// 	this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
-  			// 		this.carMarker = marker;
-  			// 	});
-        //
-  			// 	//mymarker
-  			// 	let myMarkerOptions2: MarkerOptions = {
-  			// 		position: this.myLocation,
-  			// 		title: 'You are here!',
-  			// 		icon:'www/assets/markers/male-2.png'
-  			// 	};
-        //
-  			// 	this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
-  			// 		this.myMarker = marker;
-  			// 		this.myMarker.showInfoWindow();
-  			// 	}).then(()=>{
-  			// 		this.geObserve();
-  			// 	});
-        //
-  			// }else{
-  // 				console.log("Null Parking Location ");
-  //
-  // 			// }
-  // 		}).catch((error) => {
-  // 		  console.log('Error getting location', error);
-  //         this.located=false;
-  // 		});
-	// 	});
-	// }
+ ////////LOADING         ////////////////////////////////////////////
+	presentLoadingDefault(cont:string) {
+    this.loading = this.loadingCtrl.create({
+		content: cont
+	  });
+	}
+}
 
 // 	//// just geofence things    ////////////////
 //
@@ -208,86 +257,20 @@ export class HomePage {
 // 		);
 //
 // 	}
-//
-//
-//
-//
-//
-//
 	/////////////////////////////////////////
 
 
-	// iParkedHere(){
-	// 	this.presentLoadingDefault();
-	// 	this.loading.present().then;
-	// 	this.geolocation.getCurrentPosition().then((pos) => {
-	// 				this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
-	// 				// this.stora.set('parkingCoords',this.parkingLocation);
-	// 				this.myMarker.remove();
-  //
-	// 				//mymarker
-	// 				let myMarkerOptions2: MarkerOptions = {
-	// 					position: this.myLocation,
-	// 					title: 'You are here!',
-	// 					icon:'www/assets/markers/male-2.png'
-	// 				};
-  //
-	// 				this.gmap.addMarker(myMarkerOptions2).then((marker)=>{
-	// 					this.myMarker = marker;
-	// 				});
-	// 				let myMarkerOptions1: MarkerOptions = {
-	// 					position: this.parkingLocation,
-	// 					title: 'You parked here!',
-	// 					icon: 'www/assets/markers/car.png'
-	// 				};
-	// 				this.gmap.addMarker(myMarkerOptions1).then((marker)=>{
-	// 					this.carMarker = marker;
-	// 				}).then(()=>{
-	// 					if(this.loading){this.loading.dismiss();}
-  //
-	// 					});
-	// 	}).catch((error) => {
-	// 	  console.log('Error getting location', error);
-  //     if(this.loading){this.loading.dismiss();this.located=false;}
-	// 	});
-  //
-	// }
-// 	UnParked(){
-//
-//     if (this.parkingLocation!=null){
-//   		this.stora.set('parkingCoords',null).then(()=>{
-//   			console.log("Cache Clean");
-//   		},(err) => {
-//   			console.log("Problemz with Storagezzzzz");
-//   		});
-//       this.parkingLocation=null;
-//   		this.carMarker.remove();
-// 		this.myMarker.remove();
-//
-// 				//mymarker
-// 				let myMarkerOptions3: MarkerOptions = {
-// 					position: this.myLocation,
-// 					title: 'You are here!',
-// 					icon:'www/assets/markers/car.png'
-// 				};
-//
-// 				this.gmap.addMarker(myMarkerOptions3).then((marker)=>{
-// 					this.myMarker = marker;
-// 				});
-//
-//   		console.log("Map Clean");
-//     }else{
-//       let alert = this.alertPro.create({
-//         title: 'Hey There!',
-//         subTitle: 'Seems we have no clue where you parked your Intergalactic Unicorn!\n Try that way -> ',
-//         buttons: ['OK']
-//       });
-//       alert.present();
-//     }
-// 	}
 //
 // ///ALERT/////////////////////////////////
 //
+
+//   let alert = this.alertPro.create({
+//     title: 'Hey There!',
+//     subTitle: 'Seems we have no clue where you parked your Intergalactic Unicorn!\n Try that way -> ',
+//     buttons: ['OK']
+//   });
+//   alert.present();
+
 //   doConfirm() {
 //     if (this.parkingLocation!=null){
 //       let confirm = this.alertPro.create({
@@ -314,27 +297,3 @@ export class HomePage {
 //       this.iParkedHere();
 //     }
 //   }
-// //////////SEARCH///////////////////
-//   search(target){
-//     let searchtarget=null;
-//     if(target == 0){
-//       searchtarget=this.myLocation; console.log("locating person");}
-//     else{ searchtarget=this.parkingLocation; console.log("locating car");}
-//     if( this.gmap && searchtarget ){
-//       console.log("target location: "+ searchtarget);
-//       this.gmap.animateCamera({
-//           'target': searchtarget,
-//           'tilt': 30,
-//           'zoom': 17,
-//           'bearing': 140
-//       });
-//     }else{console.log("Null map or target\n" + this.gmap+"--"+searchtarget);}
-//   }
-
- ////////LOADING         ////////////////////////////////////////////
-	presentLoadingDefault() {
-    this.loading = this.loadingCtrl.create({
-		content: 'Memorizing in your stead...'
-	  });
-	}
-}
