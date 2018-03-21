@@ -24,21 +24,25 @@ export class HomePage {
   myLocation : LatLng;
   parkingLocation: LatLng;
 
+  // stora:any;
+	// geofence : Geofence;
+
+  // UI stuff
   alertPro:any;
   splash:any;
-   //wtf mode
-  // parkFlag:boolean;
+
+  //bools
+  parkFlag:boolean;
   located:any;
-  // stora:any;
 	loading : any;
-	// geofence : Geofence;
+
   constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation) {
-		// this.geolocation = new Geolocation;
     this.gmapready=false;
 		// this.geofence = new Geofence;
 		// this.stora = this.storage;
     this.alertPro=alerCtrl;
     this.splash=this.splashScreen;
+    this.parkFlag=false;
     this.located=false;
 		this.presentLoadingDefault();
 	}
@@ -61,39 +65,57 @@ export class HomePage {
 		  'bearing': 140
 		});
   }
-  
+
   initmap() {
     let element = this.mapElement.nativeElement;
     this.gmap = GoogleMaps.create(element);
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
       console.log("|Map  READY!");
+
+      //create carMarker
       let mocloc = new LatLng(35.098765, 24.123456);
-      let myMarkerOptions3: MarkerOptions = {
-        position: mocloc,
-        title: 'You are here!',
-        icon : 'assets/markers/car.png'
-      };
-      this.createMarker(myMarkerOptions3);
+      let carloc = new LatLng(35.098765, 24.123456);
+
+      this.createMarker(carloc,'You are here!','assets/markers/car.png')
+      .then((marker: Marker)=>{
+        console.log("Car marker Resolved!");
+        // console.log(marker);
+        if (this.parkFlag){
+          this.carMarker=marker;
+          this.carMarker.setVisible(true);
+        }else{
+    			this.myMarker = marker;
+          this.myMarker.setVisible(false);
+          console.log("|||||Calling geobserve");
+          this.geObserve();
+        }
+
+      });
     });
   }
 
-  createMarker(opt: MarkerOptions){
-    console.log("|||set Marker options");
-		this.gmap.addMarker(opt)
-    .then((marker: Marker)=>{
-      console.log("||||Marker added!");
-			this.myMarker = marker;
-      this.myMarker.setVisible(false);
-      console.log("|||||Should be Calling geobserve");
-			this.geObserve();
-		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);});
+  createMarker(pos: LatLng, tit: string, ico: string) {
+    let prom = new Promise((resolve, reject) =>{
+      let opt: MarkerOptions = {
+        position: pos,
+        title: tit,
+        icon : ico
+      };
+      console.log("|||Creating Marker");
+  		this.gmap.addMarker(opt)
+      .then((marker: Marker)=>{
+        console.log("||||Marker added!");
+        // console.log(marker);
+        resolve(marker);
+  		}).catch((err)=>{console.log("~~~~Error Adding Marker!!!");console.log(err);reject(err);});
+    });
+    return prom;
   }
 
   geObserve(){
     this.watch = this._geoloc.watchPosition();
     this.watch.subscribe((pos) => {
       console.log("|||||I AM WATCHING YOU");
-      // create LatLng object
       this.located=true;
       this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
       this.myMarker.setPosition(this.myLocation);
