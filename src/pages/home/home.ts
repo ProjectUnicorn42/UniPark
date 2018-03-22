@@ -31,9 +31,9 @@ export class HomePage {
   // UI stuff
   alertPro:any;
   splash:any;
-
+  locind:Element;
   //bools
-  parkFlag:boolean;
+  parkFlag:any;
   located:any;
 	loading : any;
 
@@ -44,6 +44,7 @@ export class HomePage {
     this.splash=this.splashScreen;
     this.located=false;
     this.parkingLocation=null;
+    this.parkFlag=false;
 
 	}
 
@@ -62,9 +63,14 @@ export class HomePage {
           console.log("|Got Coords From Storage");
           console.log(coords);
           this.parkingLocation=coords;
+          if (coords!=null) {this.parkFlag=true;}
         }).catch((err)=>{console.log("~Error getting coords");});
       }).catch((err)=>{console.log("~Error Opening storage");});
     });
+    
+    //location indicator
+    this.locind=document.getElementById('locationindicator');
+
 	}
 
   moveCamera(loc: LatLng) {
@@ -151,15 +157,19 @@ export class HomePage {
     this.watch = this._geoloc.watchPosition();
     this.watch.subscribe((pos) => {
       console.log("|||||I AM WATCHING YOU");
-      this.located=true;
       this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
       this.myMarker.setPosition(this.myLocation);
+      this.applyLocAnimation();
       if (!this.myMarker.isVisible()){
         console.log("Marker was not Visible");
         this.myMarker.setVisible(true);
   			this.myMarker.showInfoWindow();
         this.moveCamera(this.myLocation);
+        this.located=true;
       }
+
+      // if (this.locind.classList.contains('run-animation')){this.locind.classList.remove('run-animation');}
+      // this.locind.classList.add('run-animation');
     });
   }
 
@@ -169,6 +179,7 @@ export class HomePage {
 		this._geoloc.getCurrentPosition().then((pos) => {
 			this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
 			this.stora.set('parkingCoords',this.parkingLocation);
+      this.parkFlag=true;
       console.log(this.parkingLocation);
       if(this.loading){this.loading.dismiss();}
       this.carMarker.setPosition(this.parkingLocation);
@@ -185,7 +196,7 @@ export class HomePage {
 
 
 	UnParked(){
-		this.presentLoadingDefault('Forgeting in your stead...');
+		this.presentLoadingDefault('Forgetting in your stead...');
     this.loading.present();
 		this._geoloc.getCurrentPosition().then((gpos) => {
       console.log("Got location");
@@ -208,6 +219,7 @@ export class HomePage {
       console.log("Problemz with Storagezzzzz");
     });
     this.parkingLocation=null;
+    this.parkFlag=false;
 	}
 
 
@@ -224,6 +236,12 @@ export class HomePage {
           'bearing': 140
       });
     }else{console.log("Null map or target\n" + this.gmap+"--"+searchtarget);}
+  }
+
+  applyLocAnimation(){
+    let clone = this.locind
+    clone.classList.add('run-animation');
+    this.locind.parentNode.replaceChild(clone, this.locind);
   }
 
  ////////LOADING         ////////////////////////////////////////////

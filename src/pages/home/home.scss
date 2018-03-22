@@ -5,4 +5,18 @@ page-home {
        color: map-get($colors, dark);
      }
    }
+
+   @keyframes dim {
+    0%   {color:color($colors, primary);}
+    100% {color:color($colors, dark); }
+}
+
+/* The element to apply the animation to */
+  .run-animation {
+      color: color($colors, dark);
+      background: color($colors, dark);
+      animation-name: dim;
+      animation-duration: 15s;
+    // animation-iteration-count: 10;
+  }
 }
