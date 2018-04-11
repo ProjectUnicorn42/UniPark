@@ -14,6 +14,7 @@ export class HomePage {
   @ViewChild('map') mapElement:ElementRef;
   gmap:GoogleMap;
 
+  //marker Stuff
 	myMarker:Marker;
 	carMarker:Marker;
   manMarker:Marker;
