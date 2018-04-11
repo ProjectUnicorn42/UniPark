@@ -67,7 +67,7 @@ export class HomePage {
         }).catch((err)=>{console.log("~Error getting coords");});
       }).catch((err)=>{console.log("~Error Opening storage");});
     });
-    
+
     //location indicator
     this.locind=document.getElementById('locationindicator');
 
@@ -85,6 +85,7 @@ export class HomePage {
   }
 
   initmap() {
+    //Git Test
     let element = this.mapElement.nativeElement;
     this.gmap = GoogleMaps.create(element);
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
