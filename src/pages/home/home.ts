@@ -37,7 +37,6 @@ export class HomePage {
 
   constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation, private stora: Storage) {
     this.gmapready=false;
-		// this.geofence = new Geofence;
     this.alertPro=alerCtrl;
     this.splash=this.splashScreen;
     this.located=false;
