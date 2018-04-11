@@ -25,8 +25,6 @@ export class HomePage {
   parkingLocation: LatLng;
 
 
-	// geofence : Geofence;
-
   // UI stuff
   alertPro:any;
   splash:any;
