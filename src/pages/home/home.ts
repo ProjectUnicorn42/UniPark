@@ -194,7 +194,7 @@ export class HomePage {
 
 
 	UnParked(){
-		this.presentLoadingDefault('Forgetting in your stead...');
+		this.presentLoadingDefault('Spreading the love...');
     this.loading.present();
 		this._geoloc.getCurrentPosition().then((gpos) => {
       console.log("Got location");
@@ -249,67 +249,3 @@ export class HomePage {
 	  });
 	}
 }
-
-// 	//// just geofence things    ////////////////
-//
-// 	addGeofence() {
-// 	  //options describing geofence
-// 	  let fence = {
-// 		id: '69ca1b88-6fbe-4e80-a4d4-ff4d3748acdb', //any unique ID
-// 		latitude:       37.285951, //center of geofence radius
-// 		longitude:      -121.936650,
-// 		radius:         100, //radius to edge of geofence in meters
-// 		transitionType: 3, //see 'Transition Types' below
-// 			notification: { //notification settings
-// 				id:             1, //any unique ID
-// 				title:          'You crossed a fence', //notification title
-// 				text:           'You just arrived to Gliwice city center.', //notification body
-// 				openAppOnClick: true //open app when notification is tapped
-// 			}
-// 		}
-//
-// 		this.geofence.addOrUpdate(fence).then(() => console.log('Geofence added'),
-// 			(err) => console.log('Geofence failed to add')
-// 		);
-//
-// 	}
-	/////////////////////////////////////////
-
-
-//
-// ///ALERT/////////////////////////////////
-//
-
-//   let alert = this.alertPro.create({
-//     title: 'Hey There!',
-//     subTitle: 'Seems we have no clue where you parked your Intergalactic Unicorn!\n Try that way -> ',
-//     buttons: ['OK']
-//   });
-//   alert.present();
-
-//   doConfirm() {
-//     if (this.parkingLocation!=null){
-//       let confirm = this.alertPro.create({
-//         title: 'Use this lightsaber?',
-//         message: 'Do you agree to use this lightsaber to do good across the intergalactic galaxy?\n It is going to delete your last Parking Location Foreverrrr!',
-//         buttons: [
-//           {
-//             text: 'Nice',
-//             handler: () => {
-//               this.UnParked();
-//               this.iParkedHere();
-//             }
-//           },
-//           {
-//             cssClass:'alert-danger',
-//             text: 'Oh Fuck',
-//             handler: () => {
-//             }
-//           }
-//         ]
-//       });
-//       confirm.present()
-//     }else{
-//       this.iParkedHere();
-//     }
-//   }

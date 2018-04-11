@@ -4,10 +4,29 @@
       <ion-icon id="locationindicator" [color]="dark" name="radio-button-on" style="margin-left:5%;" ></ion-icon>
       <ion-icon name="bulb" [color]="this.parkFlag ? 'primary' : 'dark' " style="margin-left:5%;"></ion-icon>
     </ion-title>
+    <button ion-button end menuToggle><ion-icon name="menu"></ion-icon></button>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
+
+  <ion-menu side="right" persistent="true" [content]="mycontent">
+  <ion-content>
+    <ion-list>
+      <ion-item>test 1</ion-item>
+      <ion-item>test 2</ion-item>
+      <ion-item>test 3</ion-item>
+    </ion-list>
+  </ion-content>
+  </ion-menu>
+
+  <ion-nav #mycontent [root]="rootPage"></ion-nav>
+
+
+
+
+
+
 		<div #map id="map" style="height:100%">
       <button *ngIf="!parkFlag"tappable ion-fab color="dark" (tap)="iParkedHere();"><ion-icon name="log-in"></ion-icon></button>
       <button *ngIf="parkFlag" tappable ion-fab color="dark" (tap)="UnParked();"><ion-icon name="log-out"></ion-icon></button>
