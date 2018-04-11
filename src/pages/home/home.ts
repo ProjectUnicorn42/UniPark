@@ -2,7 +2,6 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController , LoadingController, Platform } from 'ionic-angular';
 import {GoogleMap, GoogleMaps, GoogleMapsEvent, LatLng,MarkerOptions,Marker} from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
-// import { Geofence } from '@ionic-native/geofence';
 import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
