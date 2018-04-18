@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { NavController , LoadingController, Platform } from 'ionic-angular';
+import { NavController , LoadingController, Platform, ToastController } from 'ionic-angular';
 import {GoogleMap, GoogleMaps, GoogleMapsEvent, LatLng,MarkerOptions,Marker} from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
@@ -30,18 +30,21 @@ export class HomePage {
   alertPro:any;
   splash:any;
   locind:Element;
+  toast:any;
   //bools
   parkFlag:any;
   located:any;
 	loading : any;
 
-  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation, private stora: Storage) {
+  constructor( public navCtrl: NavController,public loadingCtrl: LoadingController, public alerCtrl: AlertController, private splashScreen: SplashScreen, private plt: Platform, private _geoloc: Geolocation, private stora: Storage,private toastCtrl: ToastController) {
     this.gmapready=false;
     this.alertPro=alerCtrl;
     this.splash=this.splashScreen;
     this.located=false;
     this.parkingLocation=null;
     this.parkFlag=false;
+    this.presentToast("Loading map",10000, false);
+
 
 	}
 
@@ -76,7 +79,8 @@ export class HomePage {
   		  'target': loc,
   		  'tilt': 30,
   		  'zoom': 17,
-  		  'bearing': 140
+  		  'bearing': 0,
+        'duration':2500
   		});
     }
   }
@@ -87,7 +91,8 @@ export class HomePage {
     this.gmap = GoogleMaps.create(element);
     this.gmap.one(GoogleMapsEvent.MAP_READY).then(()=>{
       console.log("|Map  READY!");
-
+      if(this.toast)  this.toast.dismiss();
+      this.presentToast("Searching location",10000,false);
       let carloc = new LatLng(35.098765, 24.123456);
       let carstr = 'You are here';
       let mocloc = new LatLng(35.098765, 24.123456); //Man Marker
@@ -154,6 +159,7 @@ export class HomePage {
   geObserve(){
     this.watch = this._geoloc.watchPosition();
     this.watch.subscribe((pos) => {
+      if(this.toast) this.toast.dismiss();
       console.log("|||||I AM WATCHING YOU");
       this.myLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
       this.myMarker.setPosition(this.myLocation);
@@ -185,16 +191,20 @@ export class HomePage {
       this.carMarker.setVisible(true);
       this.manMarker.setPosition(this.parkingLocation);
       this.myMarker=this.manMarker;
+      if(this.loading){this.loading.dismiss();}
       this.myMarker.setVisible(true);
+      this.presentToast("Parking location saved!",8000,false);
 		}).catch((error) => {
 		  console.log('Error getting location', error);
       if(this.loading){this.loading.dismiss();this.located=false;}
+      this.presentToast("Error: Could not save parking location",9000,false);
 		});
 	}
 
 
 	UnParked(){
-		this.presentLoadingDefault('Spreading the love...');
+		//this.presentLoadingDefault('Spreading the love...');
+    this.presentLoadingDefault('Forgetting parking location');
     this.loading.present();
 		this._geoloc.getCurrentPosition().then((gpos) => {
       console.log("Got location");
@@ -206,9 +216,11 @@ export class HomePage {
       this.myMarker.setTitle('You are here');
       this.myMarker.setVisible(true);
       if(this.loading){this.loading.dismiss();}
+      this.presentToast("Parking location forgoten!",8000,false);
     }).catch((error) => {
 	    console.log('Error getting location', error);
       if(this.loading){this.loading.dismiss();this.located=false;}
+      this.presentToast("Error: Could not remove parking location",9000,false);
 		});
     //clean cache
     this.stora.set('parkingCoords',null).then(()=>{
@@ -224,15 +236,14 @@ export class HomePage {
   search(target){
     let searchtarget=null;
     if(target == 0){ searchtarget = this.myLocation; console.log("locating person");}
-    else{ searchtarget = this.parkingLocation; console.log("locating car");}
-    if( this.gmap && searchtarget ){
+    else{
+      if(this.parkFlag){searchtarget = this.parkingLocation; console.log("locating parked car");}
+      else{searchtarget = this.myLocation;console.log("locating moving car");}
+
+    }
+    if(searchtarget){
       console.log("target location: "+ searchtarget);
-      this.gmap.animateCamera({
-          'target': searchtarget,
-          'tilt': 30,
-          'zoom': 17,
-          'bearing': 140
-      });
+      this.moveCamera(searchtarget);
     }else{console.log("Null map or target\n" + this.gmap+"--"+searchtarget);}
   }
 
@@ -248,4 +259,17 @@ export class HomePage {
 		content: cont
 	  });
 	}
+
+  presentToast(mess:string, dur, showClose:boolean) {
+    this.toast = this.toastCtrl.create({
+      message: mess,
+      duration: dur,
+      position: 'bottom',
+      showCloseButton: showClose,
+      closeButtonText:"Ok"
+    });
+    this.toast.present();
+    console.log("Toast: "+this.toast);
+  }
+
 }
