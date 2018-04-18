@@ -30,11 +30,11 @@
 		<div #map id="map" style="height:100%">
       <button *ngIf="!parkFlag"tappable ion-fab color="dark" (tap)="iParkedHere();"><ion-icon name="log-in"></ion-icon></button>
       <button *ngIf="parkFlag" tappable ion-fab color="dark" (tap)="UnParked();"><ion-icon name="log-out"></ion-icon></button>
-      <ion-fab small>
+      <ion-fab right small>
         <button ion-fab small color="dark"><ion-icon name="add"></ion-icon></button>
           <ion-fab-list>
-            <button tappable ion-fab small (tap)="search(0);" color="dark"><ion-icon name="man" ></ion-icon></button>
-            <button tappable ion-fab small (tap)="search(1);" color="dark"><ion-icon name="car"></ion-icon></button>
+            <button tappable ion-fab small right (tap)="search(0);" color="dark"><ion-icon name="man" ></ion-icon></button>
+            <button tappable ion-fab small right (tap)="search(1);" color="dark"><ion-icon name="car"></ion-icon></button>
           </ion-fab-list>
       </ion-fab>
     </div>
