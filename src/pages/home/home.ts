@@ -167,7 +167,7 @@ export class HomePage {
       if (!this.myMarker.isVisible()){
         console.log("Marker was not Visible");
         this.myMarker.setVisible(true);
-  			this.myMarker.showInfoWindow();
+  			// this.myMarker.showInfoWindow();
         this.moveCamera(this.myLocation);
         this.located=true;
       }
@@ -184,20 +184,21 @@ export class HomePage {
 			this.parkingLocation = new LatLng(pos.coords.latitude,pos.coords.longitude);
 			this.stora.set('parkingCoords',this.parkingLocation);
       this.parkFlag=true;
+      this.located=true;
       console.log(this.parkingLocation);
-      if(this.loading){this.loading.dismiss();}
+      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Parking location saved!",3000,false);});}
+      else{this.presentToast("Parking location saved!",3000,false);}
       this.carMarker.setPosition(this.parkingLocation);
       this.carMarker.setTitle('You Parked here');
       this.carMarker.setVisible(true);
       this.manMarker.setPosition(this.parkingLocation);
       this.myMarker=this.manMarker;
-      if(this.loading){this.loading.dismiss();}
       this.myMarker.setVisible(true);
-      this.presentToast("Parking location saved!",8000,false);
 		}).catch((error) => {
 		  console.log('Error getting location', error);
-      if(this.loading){this.loading.dismiss();this.located=false;}
-      this.presentToast("Error: Could not save parking location",9000,false);
+      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not save parking location",3000,false);});}
+      else{this.presentToast("Error: Could not save parking location",3000,false);}
+      this.located=false;
 		});
 	}
 
@@ -208,19 +209,21 @@ export class HomePage {
     this.loading.present();
 		this._geoloc.getCurrentPosition().then((gpos) => {
       console.log("Got location");
+      this.located=true;
       this.manMarker.setVisible(false);
       this.carMarker.setVisible(false);
       let curpos = new LatLng(gpos.coords.latitude, gpos.coords.longitude);
       this.myMarker=this.carMarker;
+      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Parking location forgoten!",3000,false);});}
+      else{this.presentToast("Parking location forgoten!",3000,false);}
       this.myMarker.setPosition(curpos);
       this.myMarker.setTitle('You are here');
       this.myMarker.setVisible(true);
-      if(this.loading){this.loading.dismiss();}
-      this.presentToast("Parking location forgoten!",8000,false);
     }).catch((error) => {
 	    console.log('Error getting location', error);
-      if(this.loading){this.loading.dismiss();this.located=false;}
-      this.presentToast("Error: Could not remove parking location",9000,false);
+      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not remove parking location",3000,false);});}
+      else{this.presentToast("Error: Could not remove parking location",3000,false);}
+      this.located=false;
 		});
     //clean cache
     this.stora.set('parkingCoords',null).then(()=>{
