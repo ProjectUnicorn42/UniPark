@@ -52,7 +52,7 @@ export class HomePage {
     console.log("|ViewDidLoad");
     this.plt.ready().then(()=>{
       console.log("|DEVICE READY");
-      this.splash.hide();
+      this.splashScreen.hide();
       this.initmap();
       //Storage Lookup
       this.stora.ready()
