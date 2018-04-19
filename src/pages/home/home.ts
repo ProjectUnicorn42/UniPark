@@ -212,10 +212,10 @@ export class HomePage {
       this.located=true;
       this.manMarker.setVisible(false);
       this.carMarker.setVisible(false);
-      let curpos = new LatLng(gpos.coords.latitude, gpos.coords.longitude);
-      this.myMarker=this.carMarker;
       if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Parking location forgoten!",3000,false);});}
       else{this.presentToast("Parking location forgoten!",3000,false);}
+      let curpos = new LatLng(gpos.coords.latitude, gpos.coords.longitude);
+      this.myMarker=this.carMarker;
       this.myMarker.setPosition(curpos);
       this.myMarker.setTitle('You are here');
       this.myMarker.setVisible(true);
