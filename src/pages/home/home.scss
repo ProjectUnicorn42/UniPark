@@ -16,20 +16,25 @@ ion-loading.iontrans {
     background-color:#000000;
     box-shadow: none;
   }
-  .im {
-      position: absolute;
-      allign:center;
-      background-color: #f00000;
-      -webkit-animation:spin 4s linear infinite;
-      -moz-animation:spin 4s linear infinite;
-      animation:spin 4s linear infinite;
-  }
-  @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-  @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-  @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
-
 
 }
+
+loading-content {background-color: #000000;}
+
+.loading-wrapper{background-color: #000000;}
+
+.im {
+    position: absolute;
+    align:center;
+    background-color: #f00000;
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 
 /* The element to apply the animation to */
   .run-animation {
