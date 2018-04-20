@@ -80,7 +80,7 @@ export class HomePage {
   		  'tilt': 30,
   		  'zoom': 17,
   		  'bearing': 0,
-        'duration':2500
+        'duration':2000
   		});
     }
   }
@@ -259,10 +259,11 @@ export class HomePage {
  ////////LOADING         ////////////////////////////////////////////
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
-		content: cont
+      spinner:'hide',
+	    content: `<img src="assets/markers/LoadSpinner1.png" style="margin-left:100px;"/><p style="align:center;">`,
+      cssClass:`iontrans`
 	  });
 	}
-
   presentToast(mess:string, dur, showClose:boolean) {
     this.toast = this.toastCtrl.create({
       message: mess,

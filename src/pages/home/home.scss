@@ -11,6 +11,26 @@ page-home {
     100% {color:color($colors, dark); }
 }
 
+ion-loading.iontrans {
+  .loading-wrapper {
+    background-color:#000000;
+    box-shadow: none;
+  }
+  .im {
+      position: absolute;
+      allign:center;
+      background-color: #f00000;
+      -webkit-animation:spin 4s linear infinite;
+      -moz-animation:spin 4s linear infinite;
+      animation:spin 4s linear infinite;
+  }
+  @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+  @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+  @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+
+}
+
 /* The element to apply the animation to */
   .run-animation {
       color: color($colors, dark);
@@ -19,4 +39,8 @@ page-home {
       animation-duration: 15s;
     // animation-iteration-count: 10;
   }
+
+
+
+
 }
