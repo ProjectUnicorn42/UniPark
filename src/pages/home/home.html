@@ -13,8 +13,9 @@
   <ion-menu side="left" persistent="true" [content]="mycontent">
   <ion-content>
     <ion-list>
+      <button ion-item tappable (tap)="pushSettingsPage();"><ion-icon name="lock"></ion-icon> Privacy Policy</button>
       <button ion-item tappable><ion-icon name="information-circle"></ion-icon> About</button>
-      <button ion-item tappable><ion-icon name="settings"></ion-icon> Settings</button>
+      <button ion-item tappable (tap)="pushSettingsPage();"><ion-icon name="settings"></ion-icon> Settings</button>
     </ion-list>
   </ion-content>
   </ion-menu>

@@ -5,6 +5,8 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import {SettingsPage} from '../settings/settings';
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -260,8 +262,8 @@ export class HomePage {
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
       spinner:'hide',
-	    content: `<img src="assets/markers/LoadSpinner1.png" class="nig"/><p>Keimeno MEgaaaaaaaaalo</p>`,
-      cssClass:`iontrans`
+	    content: '<ion-item><img src="assets/markers/Load30.gif" class="nig"/> Memorizing ...</ion-item>',
+      cssClass:'iontrans'
 	  });
 	}
   presentToast(mess:string, dur, showClose:boolean) {
@@ -275,5 +277,10 @@ export class HomePage {
     this.toast.present();
     console.log("Toast: "+this.toast);
   }
+
+  pushSettingsPage(){
+    this.navCtrl.push(SettingsPage);
+  }
+
 
 }
