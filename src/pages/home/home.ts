@@ -196,8 +196,8 @@ export class HomePage {
       this.myMarker.setVisible(true);
 		}).catch((error) => {
 		  console.log('Error getting location', error);
-      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not save parking location",3000,false);});}
-      else{this.presentToast("Error: Could not save parking location",3000,false);}
+      //if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not save parking location",3000,false);});}
+      //else{this.presentToast("Error: Could not save parking location",3000,false);}
       this.located=false;
 		});
 	}
@@ -260,7 +260,7 @@ export class HomePage {
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
       spinner:'hide',
-	    content: `<img src="assets/markers/LoadSpinner1.png" style="margin-left:100px;"/><p style="align:center;">Keimeno MEgaaaaaaaaalo</p>`,
+	    content: `<img src="assets/markers/LoadSpinner1.png" class="nig"/><p>Keimeno MEgaaaaaaaaalo</p>`,
       cssClass:`iontrans`
 	  });
 	}
