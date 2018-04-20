@@ -260,7 +260,7 @@ export class HomePage {
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
       spinner:'hide',
-	    content: `<img src="assets/markers/LoadSpinner1.png" style="margin-left:100px;"/><p style="align:center;">`,
+	    content: `<img src="assets/markers/LoadSpinner1.png" style="margin-left:100px;"/><p style="align:center;">Keimeno MEgaaaaaaaaalo</p>`,
       cssClass:`iontrans`
 	  });
 	}
