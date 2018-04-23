@@ -6,6 +6,7 @@ import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import {SettingsPage} from '../settings/settings';
+import {PrivacypolicyPage} from '../privacypolicy/privacypolicy';
 
 @Component({
   selector: 'page-home',
@@ -281,6 +282,8 @@ export class HomePage {
   pushSettingsPage(){
     this.navCtrl.push(SettingsPage);
   }
-
+  pushPrivacyPage(){
+    this.navCtrl.push(PrivacypolicyPage);
+  }
 
 }

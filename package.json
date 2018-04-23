@@ -21,6 +21,7 @@
     "@angular/platform-browser": "5.0.3",
     "@angular/platform-browser-dynamic": "5.0.3",
     "@ionic-native/core": "4.4.0",
+    "@ionic-native/document-viewer": "^4.7.0",
     "@ionic-native/geolocation": "^4.7.0",
     "@ionic-native/google-maps": "^4.6.3",
     "@ionic-native/splash-screen": "4.4.0",
@@ -29,6 +30,7 @@
     "cordova-android": "7.0.0",
     "cordova-ios": "4.5.4",
     "cordova-plugin-device": "^2.0.1",
+    "cordova-plugin-document-viewer": "^0.9.9",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-googlemaps": "^2.2.9",
     "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git#2.6.0",
@@ -70,7 +72,8 @@
         "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
         "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
       },
-      "cordova-sqlite-storage": {}
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-document-viewer": {}
     },
     "platforms": [
       "android",

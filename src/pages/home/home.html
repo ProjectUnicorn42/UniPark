@@ -13,12 +13,12 @@
   <ion-menu side="left" persistent="true" [content]="mycontent">
   <ion-content>
     <ion-list>
-      <button ion-item tappable (tap)="pushSettingsPage();"><ion-icon name="lock"></ion-icon> Privacy Policy</button>
-      <button ion-item tappable><ion-icon name="information-circle"></ion-icon> About</button>
+      <button ion-item tappable (tap)="pushPrivacyPage();"><ion-icon name="lock"></ion-icon> Privacy Policy</button>
+      <button ion-item tappable [disabled]="true"><ion-icon name="information-circle"></ion-icon> About</button>
       <button ion-item tappable (tap)="pushSettingsPage();"><ion-icon name="settings"></ion-icon> Settings</button>
     </ion-list>
   </ion-content>
-  </ion-menu>
+</ion-menu>
 
   <ion-nav #mycontent [root]="rootPage"></ion-nav>
 
@@ -32,7 +32,7 @@
 
 
       <ion-fab right style="margin-top:69px">
-          <button ion-fab small color="dark"><ion-icon name="search" class="im"></ion-icon></button>
+          <button ion-fab small color="dark"><ion-icon name="search"></ion-icon></button>
           <ion-fab-list side="left">
             <button *ngIf="parkFlag" tappable ion-fab small right (tap)="search(0);" color="dark"><ion-icon name="man" ></ion-icon></button>
           </ion-fab-list>
