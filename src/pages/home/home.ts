@@ -199,8 +199,8 @@ export class HomePage {
       this.myMarker.setVisible(true);
 		}).catch((error) => {
 		  console.log('Error getting location', error);
-      //if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not save parking location",3000,false);});}
-      //else{this.presentToast("Error: Could not save parking location",3000,false);}
+      if(this.loading){this.loading.dismiss().then(()=>{this.presentToast("Error: Could not save parking location",3000,false);});}
+      else{this.presentToast("Error: Could not save parking location",3000,false);}
       this.located=false;
 		});
 	}
@@ -262,9 +262,10 @@ export class HomePage {
  ////////LOADING         ////////////////////////////////////////////
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
-      spinner:'hide',
-	    content: '<ion-item><img src="assets/markers/LoadWhite.gif" class="nig"/> Memorizing ...</ion-item>',
-      cssClass:'iontrans'
+      // spinner:'hide',
+	    // content: '<ion-item><img src="assets/markers/LoadWhite.gif" class="nig"/> Memorizing ...</ion-item>',
+      // cssClass:'iontrans'
+      content: cont
 	  });
 	}
   presentToast(mess:string, dur, showClose:boolean) {
