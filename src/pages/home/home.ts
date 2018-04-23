@@ -262,7 +262,7 @@ export class HomePage {
 	presentLoadingDefault(cont:string) {
     this.loading = this.loadingCtrl.create({
       spinner:'hide',
-	    content: '<ion-item><img src="assets/markers/Load30.gif" class="nig"/> Memorizing ...</ion-item>',
+	    content: '<ion-item><img src="assets/markers/LoadWhite.gif" class="nig"/> Memorizing ...</ion-item>',
       cssClass:'iontrans'
 	  });
 	}
